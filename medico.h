@@ -1,6 +1,8 @@
 #ifndef TP_MEDICO_H
 #define TP_MEDICO_H
 
+#include "balcao.h"
+
 typedef struct medico Medico, *pMedico;
 struct medico{
 

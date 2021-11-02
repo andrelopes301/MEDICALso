@@ -5,9 +5,8 @@
 typedef struct balcao Balcao, *pBalcao;
 struct balcao{
   
-    
-    
-    
+    int numClientes;
+    int numMedicos;
 };
 
 
