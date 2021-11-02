@@ -10,7 +10,6 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_CHECK_C
   "/home/andre/so/tp/balcao.c" "/home/andre/so/tp/cmake-build-debug/CMakeFiles/tp.dir/balcao.c.o"
   "/home/andre/so/tp/cliente.c" "/home/andre/so/tp/cmake-build-debug/CMakeFiles/tp.dir/cliente.c.o"
-  "/home/andre/so/tp/main.c" "/home/andre/so/tp/cmake-build-debug/CMakeFiles/tp.dir/main.c.o"
   "/home/andre/so/tp/medico.c" "/home/andre/so/tp/cmake-build-debug/CMakeFiles/tp.dir/medico.c.o"
   )
 set(CMAKE_C_COMPILER_ID "GNU")

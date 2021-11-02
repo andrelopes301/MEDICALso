@@ -1,7 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/tp.dir/balcao.c.o"
   "CMakeFiles/tp.dir/cliente.c.o"
-  "CMakeFiles/tp.dir/main.c.o"
   "CMakeFiles/tp.dir/medico.c.o"
   "tp"
   "tp.pdb"

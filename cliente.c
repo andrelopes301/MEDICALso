@@ -1,5 +1,13 @@
-//
-// Created by andre on 11/2/21.
-//
+#include <stdio.h>
+#include <string.h>
 
-#include "cliente.h"
+
+
+
+int main(int argc, char *argv[]){
+    
+    
+    
+    
+    return 0;
+}
