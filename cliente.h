@@ -2,7 +2,7 @@
 #define TP_CLIENTE_H
 
 
-typedef struct cliente Cliente, *pCliente;
+typedef struct cliente Cliente;
 struct cliente{
 
     char nome[30];
@@ -10,10 +10,8 @@ struct cliente{
     int id;
     char areaEspecialidade[100];
     int prioridade;
-    int numUtentesFrente;
-    int numEspecialistasArea;
+    int posicaoListaEspera;
 
-    pCliente prox;
 };
 
 

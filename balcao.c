@@ -1,4 +1,6 @@
 #include "balcao.h"
+#include "cliente.h"
+#include "medico.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,90 +9,87 @@
 
 #define MAX 256
 
-void encerra(){
+void encerra() {
 
     printf("\nA encerrar o Balcão...\n");
 
-    for(int i = 3; i > 0; i--){
-        printf("%d\n",i);
+    for (int i = 3; i > 0; i--) {
+        printf("%d\n", i);
         sleep(1);
     }
 }
 
-void classifica(){
+void classifica() {
 
     pid_t pid;
-    size_t tam,tam1;
+    size_t tam, tam1;
 
     //Criacao de pipes anonimos
-    int b2c[2],c2b[2];
-    char sintomas[MAX],especialidade_Prioridade[MAX];
+    int b2c[2], c2b[2];
+    char sintomas[MAX], especialidade_Prioridade[MAX];
+    pipe(b2c);
+    pipe(c2b);
+        //b2c[0] -> descritor da leitura
+        //b2c[1] -> descritor da escrita
+
+    printf("\n---> Teste de classificação <---\n\n");
 
 
-        printf("\n---> Teste de classificação <---\n\n");
-        //Cria canais de comunicacao
-        pipe(b2c);
-        pipe(c2b);
-            //b2c[0] -> descritor da leitura
-            //b2c[1] -> descritor da escrita
+    //Criacao de processo filho -> Redirecionamento Balcao <-> Classificador
+    pid = fork();
 
-        //Criacao de processo filho -> Redirecionamento Balcao <-> Classificador
-        pid = fork();
+    if (pid < 0) {
+        perror("Erro ao criar o filho!\n");
+        exit(1);
+    }
 
-        if (pid < 0)  {
-            perror("fork");
-            exit(1);
-        }
+    if (pid > 0) { //Pai
+        close(b2c[0]);
+        close(c2b[1]);
 
-        if(pid > 0){ //Pai
-            close(b2c[0]);
-            close(c2b[1]);
+        while (1) {
+            printf("Sintomas: ");
+            fflush(stdout);
+            fgets(sintomas, sizeof(sintomas) - 1, stdin);// le o \n
 
-        while(1){
-                printf("Sintomas: ");
-                fflush(stdout);
-                fgets(sintomas,sizeof(sintomas)-1,stdin);// le o \n
+            if (strcmp(sintomas, "#fim\n") == 0)
+                break;
 
-                if(strcmp(sintomas,"#fim\n")==0)
-                    break;
+            tam = write(b2c[1], sintomas, strlen(sintomas));
+            tam1 = read(c2b[0], especialidade_Prioridade, sizeof(especialidade_Prioridade) - 1);
 
-                tam = write(b2c[1],sintomas,strlen(sintomas));
-                tam1 = read(c2b[0],especialidade_Prioridade,sizeof(especialidade_Prioridade)-1);
-
-                if(tam > 0){
-                    printf("\nEscrevi %zu bytes: %s",tam,sintomas);
-                }
-                if(tam1>0){
-                    printf("Recebi %zu bytes: %s \n",tam1,especialidade_Prioridade);
-                }
+            if (tam > 0) {
+                printf("\nEscrevi %zu bytes: %s", tam, sintomas);
             }
-
-            close(b2c[1]);
-            close(c2b[0]);
-
+            if (tam1 > 0) {
+                printf("Recebi %zu bytes: %s \n", tam1, especialidade_Prioridade);
+            }
         }
 
-        if(pid == 0){ //Filho
+        close(b2c[1]);
+        close(c2b[0]);
+    }
 
-            close(0);
-            dup(b2c[0]);
-            close(b2c[0]);
-            close(b2c[1]);
-            close(1);
-            dup(c2b[1]);
-            close(c2b[0]);
-            close(c2b[1]);
+    if (pid == 0) { //Filho
 
-            execl("./classificador","classificador", NULL);
-        }
+        close(0);
+        dup(b2c[0]);
+        close(b2c[0]);
+        close(b2c[1]);
+        close(1);
+        dup(c2b[1]);
+        close(c2b[0]);
+        close(c2b[1]);
+
+        execl("./classificador", "classificador", NULL);
+    }
 
     printf("Especialidade: %s\n", especialidade_Prioridade);
     printf("---> Fim da classificação <---\n\n");
 }
 
 
-
-void help(){
+void help() {
     printf("\n-------Comandos-------\n\n");
     printf("-> utentes\n");
     printf("-> especilalistas\n");
@@ -102,40 +101,46 @@ void help(){
     printf("----------------------\n\n");
 
 }
-int main(int argc, char *argv[]){
+
+
+
+int main(int argc, char *argv[]) {
 
 
     char comando[50];
     int MAXCLIENTES, MAXMEDICOS;
 
 
-    sscanf(getenv("MAXCLIENTES"),"%d",&MAXCLIENTES);
-    sscanf(getenv("MAXMEDICOS"),"%d",&MAXMEDICOS);
+    sscanf(getenv("MAXCLIENTES"), "%d", &MAXCLIENTES);
+    sscanf(getenv("MAXMEDICOS"), "%d", &MAXMEDICOS);
+
+    Cliente listaUtentes[MAXCLIENTES];
+    Medico listaMedicos[MAXMEDICOS];
 
     printf("MAXCLIENTES: %d\n", MAXCLIENTES);
     printf("MAXMEDICOS: %d\n", MAXMEDICOS);
 
     classifica();
 
-    while(1){
+    while (1) {
 
-        fgets(comando,sizeof(comando)-1,stdin);// le o \n
+        fgets(comando, sizeof(comando) - 1, stdin);// le o \n
 
-        if(strcmp(comando,"utentes\n") == 0){
+        if (strcmp(comando, "utentes\n") == 0) {
             printf("Funcionalidade por implementar...\n");
-        }else if(strcmp(comando,"especialistas\n") == 0){
+        } else if (strcmp(comando, "especialistas\n") == 0) {
             printf("Funcionalidade por implementar...\n");
-        }else if(strcmp(comando,"delut\n") == 0) {
+        } else if (strcmp(comando, "delut\n") == 0) {
             printf("Funcionalidade por implementar...\n");
-        }else if(strcmp(comando,"delesp\n") == 0) {
+        } else if (strcmp(comando, "delesp\n") == 0) {
             printf("Funcionalidade por implementar...\n");
-        }else if(strcmp(comando,"freq\n") == 0) {
+        } else if (strcmp(comando, "freq\n") == 0) {
             printf("Funcionalidade por implementar...\n");
-        }else if(strcmp(comando,"help\n") == 0) {
+        } else if (strcmp(comando, "help\n") == 0) {
             help();
-        }else if(strcmp(comando,"encerra\n") == 0) {
-                encerra();
-                return 0;
+        } else if (strcmp(comando, "encerra\n") == 0) {
+            encerra();
+            return 0;
         }
 
     }
