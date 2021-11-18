@@ -103,6 +103,21 @@ void help() {
 }
 
 
+Balcao inicializarStructBalcao(int MAXMEDICOS, int MAXCLIENTES){
+
+    Balcao b;
+    b.maxMedicos = MAXMEDICOS;
+    b.maxClientes = MAXCLIENTES;
+    for(int i = 0; i < 5; i++){
+        b.filaEspera[i] = 0;
+    }
+    b.numClientes = 0;
+    b.numMedicos = 0;
+
+    return b;
+
+}
+
 
 int main(int argc, char *argv[]) {
 
@@ -116,9 +131,12 @@ int main(int argc, char *argv[]) {
 
     Cliente listaUtentes[MAXCLIENTES];
     Medico listaMedicos[MAXMEDICOS];
+    Balcao balcao;
 
     printf("MAXCLIENTES: %d\n", MAXCLIENTES);
     printf("MAXMEDICOS: %d\n", MAXMEDICOS);
+
+    balcao = inicializarStructBalcao(MAXMEDICOS,MAXCLIENTES);
 
     classifica();
 

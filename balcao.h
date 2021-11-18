@@ -10,8 +10,20 @@ struct balcao{
     int numClientes;
     int numMedicos;
     int filaEspera[MAXESPECIALIDADES];
+    //Exemplo:
+    //filaEspera[0] - 1 utente - ortopedia
+    //filaEspera[1] - 3 utentes na fila de espera- neurologia
+    // ...
+
 };
 
+
+
+void encerra();
+void help();
+void classifica();
+
+Balcao inicializarStructBalcao( int MAXMEDICOS, int MAXCLIENTES);
 
 
 
