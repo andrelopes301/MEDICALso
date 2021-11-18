@@ -28,7 +28,6 @@ void classifica(){
 
 
         printf("\n---> Teste de classificação <---\n\n");
-
         //Cria canais de comunicacao
         pipe(b2c);
         pipe(c2b);
@@ -46,6 +45,7 @@ void classifica(){
         if(pid > 0){ //Pai
             close(b2c[0]);
             close(c2b[1]);
+
         while(1){
                 printf("Sintomas: ");
                 fflush(stdout);
@@ -63,12 +63,7 @@ void classifica(){
                 if(tam1>0){
                     printf("Recebi %zu bytes: %s \n",tam1,especialidade_Prioridade);
                 }
-
-               memset(stdin,0,99);
-
             }
-            close(b2c[1]);
-            close(c2b[0]);
         }
 
         if(pid == 0){ //Filho
