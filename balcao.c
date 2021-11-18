@@ -64,6 +64,10 @@ void classifica(){
                     printf("Recebi %zu bytes: %s \n",tam1,especialidade_Prioridade);
                 }
             }
+
+            close(b2c[1]);
+            close(c2b[0]);
+
         }
 
         if(pid == 0){ //Filho
