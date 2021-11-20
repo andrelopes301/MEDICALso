@@ -8,7 +8,7 @@
 #include <sys/wait.h>
 
 #define MAX 256
-
+#define MAXESPECIALIDADES 5
 
 
 void encerra() {
@@ -111,7 +111,7 @@ Balcao b;
 
     b.maxMedicos = MAXMEDICOS;
     b.maxClientes = MAXCLIENTES;
-    for(int i = 0; i < 5; i++){
+    for(int i = 0; i < MAXESPECIALIDADES; i++){
         b.filaEspera[i] = 0;
         b.numEspecialistas[i] = 0;
     }
