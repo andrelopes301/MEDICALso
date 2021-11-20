@@ -9,6 +9,8 @@
 
 #define MAX 256
 
+
+
 void encerra() {
 
     printf("\nA encerrar o Balcão...\n");
@@ -24,7 +26,7 @@ void classifica() {
     pid_t pid;
     size_t tam, tam1;
 
-    //Criacao de pipes anonimos
+    //Criacao dos pipes anonimos
     int b2c[2], c2b[2];
     char sintomas[MAX], especialidade_Prioridade[MAX];
     pipe(b2c);
@@ -85,7 +87,7 @@ void classifica() {
     }
 
     printf("Especialidade: %s\n", especialidade_Prioridade);
-    printf("---> Fim da classificação <---\n\n");
+    printf("-----> Fim da classificação <-----\n\n");
 }
 
 
@@ -103,16 +105,19 @@ void help() {
 }
 
 
-Balcao inicializarStructBalcao(int MAXMEDICOS, int MAXCLIENTES){
+Balcao inicializarDadosBalcao(int MAXMEDICOS, int MAXCLIENTES){
 
-    Balcao b;
+Balcao b;
+
     b.maxMedicos = MAXMEDICOS;
     b.maxClientes = MAXCLIENTES;
     for(int i = 0; i < 5; i++){
         b.filaEspera[i] = 0;
+        b.numEspecialistas[i] = 0;
     }
     b.numClientes = 0;
     b.numMedicos = 0;
+
 
     return b;
 
@@ -125,7 +130,7 @@ int main(int argc, char *argv[]) {
     char comando[50];
     int MAXCLIENTES, MAXMEDICOS;
 
-
+    //Receber as variáveis de ambiente
     sscanf(getenv("MAXCLIENTES"), "%d", &MAXCLIENTES);
     sscanf(getenv("MAXMEDICOS"), "%d", &MAXMEDICOS);
 
@@ -133,16 +138,18 @@ int main(int argc, char *argv[]) {
     Medico listaMedicos[MAXMEDICOS];
     Balcao balcao;
 
+
     printf("MAXCLIENTES: %d\n", MAXCLIENTES);
     printf("MAXMEDICOS: %d\n", MAXMEDICOS);
 
-    balcao = inicializarStructBalcao(MAXMEDICOS,MAXCLIENTES);
+    balcao = inicializarDadosBalcao(MAXMEDICOS,MAXCLIENTES);
 
     classifica();
 
     while (1) {
 
         fgets(comando, sizeof(comando) - 1, stdin);// le o \n
+
 
         if (strcmp(comando, "utentes\n") == 0) {
             printf("Funcionalidade por implementar...\n");

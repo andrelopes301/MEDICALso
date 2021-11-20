@@ -2,7 +2,7 @@
 #define TP_CLIENTE_H
 
 
-typedef struct cliente Cliente;
+typedef struct cliente Cliente, *pCliente;
 struct cliente{
 
     char nome[30];
