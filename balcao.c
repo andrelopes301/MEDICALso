@@ -28,11 +28,11 @@ void classifica() {
 
     //Criacao dos pipes anonimos
     int b2c[2], c2b[2];
-    char sintomas[MAX], sintomasTemp[MAX],  especialidade_Prioridade[MAX], especialidade[MAX];
+    char sintomas[MAX], sintomasTemp[MAX], especialidade_Prioridade[MAX], especialidade[MAX];
     pipe(b2c);
     pipe(c2b);
-         //b2c[0] -> descritor da leitura
-         //b2c[1] -> descritor da escrita
+        //b2c[0] -> descritor da leitura
+        //b2c[1] -> descritor da escrita
 
     printf("\n---> Teste de classificação <---\n\n");
 
@@ -46,22 +46,22 @@ void classifica() {
 
     if (pid > 0) { //Pai
 
-        close(b2c[0]);
-        close(c2b[1]);
+        close(b2c[0]); //fecha canal de leitura
+        close(c2b[1]); //fecha canal de escrita
 
         while (1) {
             printf("Sintomas: ");
             fflush(stdout);
             fgets(sintomas, sizeof(sintomas) - 1, stdin); // le o \n
 
-            if (strcmp(sintomas, "#fim\n") == 0){
-                strcpy(sintomas,sintomasTemp); //para evitar ficar com "#fim" nos sintomas
+            if (strcmp(sintomas, "#fim\n") == 0) {
+                strcpy(sintomas, sintomasTemp); //para evitar ficar com "#fim" nos sintomas
                 break;
-            }else
-                strcpy(sintomasTemp,sintomas);
+            } else
+                strcpy(sintomasTemp, sintomas);
 
 
-            tam = write(b2c[1], sintomas, strlen(sintomas));
+            tam = write(b2c[1], sintomas, strlen(sintomas)); 
             tam1 = read(c2b[0], especialidade_Prioridade, sizeof(especialidade_Prioridade) - 1);
 
             if (tam > 0)
@@ -71,29 +71,33 @@ void classifica() {
                 printf("Recebi %zu bytes: %s \n", tam1, especialidade_Prioridade);
 
         }
+        //Fechar canais
         close(b2c[1]);
         close(c2b[0]);
     }
 
     if (pid == 0) { //Filho
 
-        close(0);
-        dup(b2c[0]);
-        close(b2c[0]);
-        close(b2c[1]);
-        close(1);
-        dup(c2b[1]);
-        close(c2b[0]);
-        close(c2b[1]);
+        close(0);   //libertar stdin
+        dup(b2c[0]); //duplica extremidade de leitura para o lugar libertado
+        close(b2c[0]); //fecha extremidade de leitura pk ja foi duplicada
+        close(b2c[1]); //fecha extremidade de escrita 
+        close(1);  //libertar stdout
+        dup(c2b[1]); //duplica extremidade de escrita para o lugar libertado
+        close(c2b[1]); //fecha extremidade de escrita pk ja foi duplicada
+        close(c2b[0]); //fecha extremidade de leitura 
+      
 
         execl("./classificador", "classificador", NULL);
     }
     waitpid(pid, &estado, 0); // para evitar que o processo do classificador fique no estado "zombie"
 
     //Remover o inteiro da string
-    for(int i=0; i < strlen(especialidade_Prioridade) - 3; i++)
-        especialidade[i] = especialidade_Prioridade[i];
-
+    int i = 0;
+        while (especialidade_Prioridade[i] != ' ') {
+             especialidade[i] = especialidade_Prioridade[i];
+             i++;
+    }
     //Converter a prioridade para um inteiro
     char priorid = especialidade_Prioridade[strlen(especialidade_Prioridade)-2];
     int prioridade = priorid - '0';
