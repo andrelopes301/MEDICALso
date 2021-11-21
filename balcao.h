@@ -3,6 +3,15 @@
 
 #define MAXESPECIALIDADES 5
 
+enum especialidades{
+    oftalmologia = 0,
+    neurologia = 1,
+    estomatologia = 2,
+    ortopedia = 3,
+    geral = 4
+};
+
+
 typedef struct balcao Balcao, *pBalcao;
 struct balcao{
     int maxClientes;
@@ -11,8 +20,9 @@ struct balcao{
     int numMedicos;
     int numEspecialistas[MAXESPECIALIDADES]; // numero de especialistas por area
     int filaEspera[MAXESPECIALIDADES]; //numero de pessoas em fila de espera por area
+
     //Exemplo:
-    //filaEspera[0] - 1 utente - ortopedia
+    //filaEspera[0] - 1 utente - oftalmologia
     //filaEspera[1] - 3 utentes (na fila de espera) - neurologia
     // ...
 
@@ -24,7 +34,7 @@ void encerra();
 void help();
 void classifica();
 
-Balcao inicializarStructBalcao(int MAXMEDICOS, int MAXCLIENTES);
+Balcao inicializarDadosBalcao(int MAXMEDICOS, int MAXCLIENTES);
 
 
 
