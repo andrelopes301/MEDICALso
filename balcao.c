@@ -90,14 +90,14 @@ void classifica() {
     }
     waitpid(pid, &estado, 0); // para evitar que o processo do classificador fique no estado "zombie"
 
-
     //Remover o inteiro da string
-    for(int i=0; i < strlen(especialidade_Prioridade) - 2; i++)
+    for(int i=0; i < strlen(especialidade_Prioridade) - 3; i++)
         especialidade[i] = especialidade_Prioridade[i];
 
     //Converter a prioridade para um inteiro
     char priorid = especialidade_Prioridade[strlen(especialidade_Prioridade)-2];
     int prioridade = priorid - '0';
+
 
     printf("\nClassificação Obtida: \n\n");
     printf("  Sintomas: %s", sintomas);
@@ -158,17 +158,16 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-
+    Balcao balcao;
     Cliente listaUtentes[maxCLientes];
     Medico listaMedicos[maxMedicos];
-    Balcao balcao;
 
     balcao = inicializarDadosBalcao(maxMedicos,maxCLientes);
+
 
     classifica();
 
     while (1) {
-
 
         printf("Comando: ");
         fflush(stdout);
@@ -176,15 +175,15 @@ int main(int argc, char *argv[]) {
         // printf("O administrador introduziu o comando: %s", comando);
 
         if (strcmp(comando, "utentes\n") == 0) {
-            printf("\nFuncionalidade por implementar...\n\n");
+            printf("[INFO] Funcionalidade por implementar...\n\n");
         } else if (strcmp(comando, "especialistas\n") == 0) {
-            printf("\nFuncionalidade por implementar...\n\n");
+            printf("[INFO] Funcionalidade por implementar...\n\n");
         } else if (strcmp(comando, "delut\n") == 0) {
-            printf("\nFuncionalidade por implementar...\n\n");
+            printf("[INFO] Funcionalidade por implementar...\n\n");
         } else if (strcmp(comando, "delesp\n") == 0) {
-            printf("\nFuncionalidade por implementar...\n\n");
+            printf("[INFO] Funcionalidade por implementar...\n\n");
         } else if (strcmp(comando, "freq\n") == 0) {
-            printf("\nFuncionalidade por implementar...\n\n");
+            printf("[INFO] Funcionalidade por implementar...\n\n");
         } else if (strcmp(comando, "help\n") == 0) {
             help();
         } else if (strcmp(comando, "encerra\n") == 0) {
