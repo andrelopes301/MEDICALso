@@ -31,8 +31,8 @@ void classifica() {
     char sintomas[MAX], sintomasTemp[MAX], especialidade_Prioridade[MAX], especialidade[MAX];
     pipe(b2c);
     pipe(c2b);
-        //b2c[0] -> descritor da leitura
-        //b2c[1] -> descritor da escrita
+    //b2c[0] -> descritor da leitura
+    //b2c[1] -> descritor da escrita
 
     printf("\n---> Teste de classificação <---\n\n");
 
@@ -46,23 +46,25 @@ void classifica() {
 
     if (pid > 0) { //Pai
 
-        close(b2c[0]); //fecha canal de leitura
-        close(c2b[1]); //fecha canal de escrita
+        close(b2c[STDIN_FILENO]); //fecha canal de leitura
+        close(c2b[STDOUT_FILENO]); //fecha canal de escrita
 
         while (1) {
             printf("Sintomas: ");
             fflush(stdout);
             fgets(sintomas, sizeof(sintomas) - 1, stdin); // le o \n
+            tam = write(b2c[1], sintomas, strlen(sintomas));
+
 
             if (strcmp(sintomas, "#fim\n") == 0) {
                 strcpy(sintomas, sintomasTemp); //para evitar ficar com "#fim" nos sintomas
+                waitpid(pid, &estado, 0); // para evitar que o processo do classificador fique no estado "zombie"
                 break;
             } else
                 strcpy(sintomasTemp, sintomas);
 
-
-            tam = write(b2c[1], sintomas, strlen(sintomas)); 
             tam1 = read(c2b[0], especialidade_Prioridade, sizeof(especialidade_Prioridade) - 1);
+            especialidade_Prioridade[tam1] = '\0';
 
             if (tam > 0)
                 printf("\nEscrevi %zu bytes: %s", tam, sintomas);
@@ -72,31 +74,31 @@ void classifica() {
 
         }
         //Fechar canais
-        close(b2c[1]);
-        close(c2b[0]);
+        close(b2c[STDOUT_FILENO]);
+        close(c2b[STDIN_FILENO]);
     }
 
     if (pid == 0) { //Filho
 
-        close(0);   //libertar stdin
-        dup(b2c[0]); //duplica extremidade de leitura para o lugar libertado
-        close(b2c[0]); //fecha extremidade de leitura pk ja foi duplicada
-        close(b2c[1]); //fecha extremidade de escrita 
-        close(1);  //libertar stdout
-        dup(c2b[1]); //duplica extremidade de escrita para o lugar libertado
-        close(c2b[1]); //fecha extremidade de escrita pk ja foi duplicada
-        close(c2b[0]); //fecha extremidade de leitura 
-      
+        close(STDIN_FILENO);   //libertar stdin
+        dup(b2c[STDIN_FILENO]); //duplica extremidade de leitura para o lugar libertado
+        close(b2c[STDIN_FILENO]); //fecha extremidade de leitura pk ja foi duplicada
+        close(b2c[STDOUT_FILENO]); //fecha extremidade de escrita
+        close(STDOUT_FILENO);  //libertar stdout
+        dup(c2b[STDOUT_FILENO]); //duplica extremidade de escrita para o lugar libertado
+        close(c2b[STDOUT_FILENO]); //fecha extremidade de escrita pk ja foi duplicada
+        close(c2b[STDIN_FILENO]); //fecha extremidade de leitura
+
 
         execl("./classificador", "classificador", NULL);
     }
-    waitpid(pid, &estado, 0); // para evitar que o processo do classificador fique no estado "zombie"
+
 
     //Remover o inteiro da string
     int i = 0;
-        while (especialidade_Prioridade[i] != ' ') {
-             especialidade[i] = especialidade_Prioridade[i];
-             i++;
+    while (especialidade_Prioridade[i] != ' ') {
+        especialidade[i] = especialidade_Prioridade[i];
+        i++;
     }
     //Converter a prioridade para um inteiro
     char priorid = especialidade_Prioridade[strlen(especialidade_Prioridade)-2];
@@ -140,6 +142,101 @@ Balcao inicializarDadosBalcao(int MAXMEDICOS, int MAXCLIENTES){
     return b;
 }
 
+Medico atribuirDadosMedico( char *nome, char *especialidade,int pidM){
+
+    Medico medico;
+
+    strcpy(medico.nome,nome);
+    strcpy(medico.especialidade,especialidade);
+    medico.id_Medico = pidM;
+    medico.estado = 0;
+
+    return medico;
+}
+void adicionarMedico(Balcao *b, pMedico medico, int id, char *nome,char *especialidade,int pidM){
+    if(b->numMedicos == b->maxMedicos){
+        fprintf(stderr,"[INFO] LOTAÇÃO MÁXIMA DE MÉDICOS ATINGIDA\n");
+        return;
+    }
+
+    medico[id] = atribuirDadosMedico(nome,especialidade,pidM);
+    b->numMedicos++;
+    fprintf(stdout,"[INFO] Cliente '%s' adicionado ao sistema!\n",nome);
+}
+void removerMedico(Balcao *b, pMedico medico, int id){
+    if(b->numMedicos > 0) {
+        b->numMedicos--;
+        fprintf(stdout,"[INFO] Médico '%s' removido do sistema!\n",medico[id].nome);
+    }
+
+    atribuirDadosMedico( "...", "...", -1);
+}
+
+void mostrarDadosMedico(int id, Medico medico){
+
+    printf("\nMédico [%d]:\n\tNome: %s\n\tEspecialidade: %s\n\tEstado: %d\n\n",id,medico.nome,medico.especialidade,medico.estado);
+
+}
+void mostrarTodosMedicos(pBalcao b, pMedico medico){
+
+    for(int i = 0; i < b->numMedicos;i++)
+        mostrarDadosMedico(i,medico[i]);
+
+}
+
+
+Cliente atribuirDadosCliente(char *nome,char *sintomas,char *especialidade,int prioridade,int listaEspera,int pidC){
+
+    Cliente cli;
+
+    strcpy(cli.nome,nome);
+    cli.id = pidC;
+    strcpy(cli.sintomas,sintomas);
+    strcpy(cli.areaEspecialidade,especialidade);
+    cli.prioridade = prioridade;
+    cli.posicaoListaEspera = listaEspera;
+
+    return cli;
+}
+
+
+void adicionarCliente(Balcao *b, pCliente utente, int id, char *nome,char *sintomas,char *especialidade,int prioridade,int listaEspera,int pidC){
+
+
+    if(b->numClientes == b->maxClientes){
+        fprintf(stderr,"[INFO] LOTAÇÃO MÁXIMA DE CLIENTES ATINGIDA\n");
+        return;
+    }
+
+    utente[id] = atribuirDadosCliente(nome,sintomas,especialidade,prioridade,listaEspera,pidC);
+    b->numClientes++;
+    fprintf(stdout,"[INFO] Cliente '%s' adicionado ao sistema!\n",nome);
+}
+
+
+void removerCLiente(Balcao *b,pCliente utente, int id){
+
+    if(b->numClientes > 0) {
+        b->numClientes--;
+        fprintf(stdout,"[INFO] Cliente '%s' removido do sistema!\n",utente[id].nome);
+    }
+
+    utente[id] = atribuirDadosCliente("...","...","...",0,0,-1);
+
+
+}
+
+void mostrarDadosCliente(int id, Cliente utente){
+    printf("\nCliente [%d]:\n\tNome: %s\n\tSintomas: %s\n\tEspecialidade: %s\n\tPrioridade: %d\n\tPosicaoEspera: %d\n\n",id,utente.nome,utente.sintomas,utente.areaEspecialidade,utente.prioridade,utente.posicaoListaEspera);
+}
+
+
+void mostrarTodosClientes(pBalcao b, pCliente utente){
+
+    for(int i = 0; i < b->numClientes;i++)
+        mostrarDadosCliente(i,utente[i]);
+
+}
 
 int main(int argc, char *argv[]) {
 
@@ -167,6 +264,9 @@ int main(int argc, char *argv[]) {
     Medico listaMedicos[maxMedicos];
 
     balcao = inicializarDadosBalcao(maxMedicos,maxCLientes);
+
+    adicionarCliente(&balcao,listaUtentes,0,"Andre","dor barriga","estomatologia",1,0,9034);
+    mostrarTodosClientes(&balcao,listaUtentes);
 
 
     classifica();
