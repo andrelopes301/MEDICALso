@@ -7,9 +7,10 @@ struct cliente{
 
     char nome[30];
     char sintomas[100];
-    int id;
     char areaEspecialidade[100];
     int prioridade;
+    int id; // 0 - cliente nao existe
+            // > 0, - cliente existe e o id corresponde ao seu pid
     int posicaoListaEspera;
 
 };
