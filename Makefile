@@ -1,10 +1,24 @@
-all: balcao 
+all: balcao cliente medico
 
 balcao: balcao.o 
 	gcc balcao.o -o balcao
 
-balcao.o: balcao.c balcao.h medico.h cliente.h
+balcao.o: balcao.c balcao.h
 	gcc -c balcao.c
 
+
+cliente: cliente.o
+	gcc cliente.o -o cliente
+
+cliente.o: cliente.c balcao.h cliente.h
+	gcc -c cliente.c
+
+medico: medico.o
+	gcc medico.o -o medico
+
+medico.o: medico.c balcao.h medico.h
+	gcc -c medico.c
+
+
 clean: 
-	rm *.o balcao
+	rm *.o balcao cliente medico

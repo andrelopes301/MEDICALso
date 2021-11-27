@@ -1,7 +1,12 @@
 #ifndef TP_BALCAO_H
 #define TP_BALCAO_H
 
+#include "cliente.h"
+#include "medico.h"
+
 #define MAXESPECIALIDADES 5
+#define MAX 256
+#define BALCAO_FIFO "balcao_fifo"
 
 enum especialidades{
     oftalmologia = 0,
@@ -36,6 +41,22 @@ void classifica();
 
 Balcao inicializarDadosBalcao(int MAXMEDICOS, int MAXCLIENTES);
 
+
+
+
+/// CLIENTE
+Cliente atribuirDadosCliente(char *nome,char *sintomas,char *especialidade,int prioridade,int listaEspera,int pidC);
+void adicionarCliente(Balcao *b, pCliente utente, int id, char *nome,char *sintomas,char *especialidade,int prioridade,int listaEspera,int pidC);
+void removerCLiente(Balcao *b,pCliente utente, int id);
+void mostrarDadosCliente(int id, Cliente utente);
+void mostrarTodosClientes(pBalcao b, pCliente utente);
+
+/// MEDICO
+Medico atribuirDadosMedico( char *nome, char *especialidade,int pidM);
+void adicionarMedico(Balcao *b, pMedico medico, int id, char *nome,char *especialidade,int pidM);
+void removerMedico(Balcao *b, pMedico medico, int id);
+void mostrarDadosMedico(int id, Medico medico);
+void mostrarTodosMedicos(pBalcao b, pMedico medico);
 
 
 

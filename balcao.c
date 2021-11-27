@@ -1,13 +1,11 @@
 #include "balcao.h"
-#include "cliente.h"
-#include "medico.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
 
-#define MAX 256
 
 
 void encerra() {
@@ -148,11 +146,12 @@ Medico atribuirDadosMedico( char *nome, char *especialidade,int pidM){
 
     strcpy(medico.nome,nome);
     strcpy(medico.especialidade,especialidade);
-    medico.id_Medico = pidM;
+    medico.id = pidM;
     medico.estado = 0;
 
     return medico;
 }
+
 void adicionarMedico(Balcao *b, pMedico medico, int id, char *nome,char *especialidade,int pidM){
     if(b->numMedicos == b->maxMedicos){
         fprintf(stderr,"[INFO] LOTAÇÃO MÁXIMA DE MÉDICOS ATINGIDA\n");
@@ -163,6 +162,7 @@ void adicionarMedico(Balcao *b, pMedico medico, int id, char *nome,char *especia
     b->numMedicos++;
     fprintf(stdout,"[INFO] Cliente '%s' adicionado ao sistema!\n",nome);
 }
+
 void removerMedico(Balcao *b, pMedico medico, int id){
     if(b->numMedicos > 0) {
         b->numMedicos--;
@@ -177,13 +177,14 @@ void mostrarDadosMedico(int id, Medico medico){
     printf("\nMédico [%d]:\n\tNome: %s\n\tEspecialidade: %s\n\tEstado: %d\n\n",id,medico.nome,medico.especialidade,medico.estado);
 
 }
+
+
 void mostrarTodosMedicos(pBalcao b, pMedico medico){
 
     for(int i = 0; i < b->numMedicos;i++)
         mostrarDadosMedico(i,medico[i]);
 
 }
-
 
 Cliente atribuirDadosCliente(char *nome,char *sintomas,char *especialidade,int prioridade,int listaEspera,int pidC){
 
@@ -199,7 +200,6 @@ Cliente atribuirDadosCliente(char *nome,char *sintomas,char *especialidade,int p
     return cli;
 }
 
-
 void adicionarCliente(Balcao *b, pCliente utente, int id, char *nome,char *sintomas,char *especialidade,int prioridade,int listaEspera,int pidC){
 
 
@@ -212,7 +212,6 @@ void adicionarCliente(Balcao *b, pCliente utente, int id, char *nome,char *sinto
     b->numClientes++;
     fprintf(stdout,"[INFO] Cliente '%s' adicionado ao sistema!\n",nome);
 }
-
 
 void removerCLiente(Balcao *b,pCliente utente, int id){
 
@@ -229,7 +228,6 @@ void removerCLiente(Balcao *b,pCliente utente, int id){
 void mostrarDadosCliente(int id, Cliente utente){
     printf("\nCliente [%d]:\n\tNome: %s\n\tSintomas: %s\n\tEspecialidade: %s\n\tPrioridade: %d\n\tPosicaoEspera: %d\n\n",id,utente.nome,utente.sintomas,utente.areaEspecialidade,utente.prioridade,utente.posicaoListaEspera);
 }
-
 
 void mostrarTodosClientes(pBalcao b, pCliente utente){
 
@@ -259,6 +257,18 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+
+    //verifica se ja existe algum balcao em funcionamento
+    if(access(BALCAO_FIFO, F_OK) == 0){
+        printf("[INFO] Já existe um Balcão em funcionamento!\n");
+        exit(2);
+    }
+
+    mkfifo(BALCAO_FIFO, 0600);
+    printf("[INFO] Criei o FIFO do Balcão...\n");
+
+
+
     Balcao balcao;
     Cliente listaUtentes[maxCLientes];
     Medico listaMedicos[maxMedicos];
@@ -269,7 +279,11 @@ int main(int argc, char *argv[]) {
     mostrarTodosClientes(&balcao,listaUtentes);
 
 
-    classifica();
+
+
+
+
+    //classifica();
 
     while (1) {
 
@@ -292,10 +306,15 @@ int main(int argc, char *argv[]) {
             help();
         } else if (strcmp(comando, "encerra\n") == 0) {
             encerra();
-            return 0;
+            break;
         }  else {
             printf("[INFO] Comando Invalido!\n\n");
         }
 
     }
+
+    unlink(BALCAO_FIFO);
+    return 0;
+
+
 }

@@ -14,5 +14,6 @@ struct medico{
 };
 
 
+
 #endif //TP_MEDICO_H
 
