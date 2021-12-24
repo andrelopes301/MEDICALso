@@ -1,12 +1,27 @@
 #ifndef TP_BALCAO_H
 #define TP_BALCAO_H
 
-#include "cliente.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "medico.h"
+#include "cliente.h"
+
 
 #define MAXESPECIALIDADES 5
 #define MAX 256
+
+// nome do FIFO do Balcão
 #define BALCAO_FIFO "balcao_fifo"
+// nome do FIFO de cada Cliente - %d = pid
+#define CLIENTE_FIFO "cliente_%d_fifo"
+// nome do FIFO de cada Medico - %d = pid
+#define MEDICO_FIFO "medico_%d_fifo"
+
 
 enum especialidades{
     oftalmologia = 0,
@@ -33,30 +48,51 @@ struct balcao{
 
 };
 
+//Estrutura da mensagem: cliente -> balcao
+typedef struct {
+    pid_t	pid_cliente;
+    char	mensagem[MAX];
+} Mensagem_cliente_para_Balcao;
+
+//Estrutura da mensagem de respota do balcao
+typedef struct {
+    pid_t pid_balcao;
+    char	mensagem[MAX];
+} Mensagem_Balcao;
+
+typedef struct {
+    pid_t	pid_medico;
+    char	mensagem[MAX];
+} Mensagem_medico_para_Balcao;
+
+
+
+
+
 
 
 void encerra();
 void help();
-void classifica();
+const char* classifica(char *sintomas);
+int comandos();
 
 Balcao inicializarDadosBalcao(int MAXMEDICOS, int MAXCLIENTES);
 
 
-
+/// MEDICO
+void adicionarMedico(Balcao *b, pMedico listaMedicos, int id, Medico medico);
+void removerMedico(Balcao *b, pMedico medico, int id);
+void mostrarTodosMedicos(pBalcao b, pMedico medico);
+void mostrarDadosMedico(int id, Medico medico);
+void sinal_vida(int s);
 
 /// CLIENTE
-Cliente atribuirDadosCliente(char *nome,char *sintomas,char *especialidade,int prioridade,int listaEspera,int pidC);
-void adicionarCliente(Balcao *b, pCliente utente, int id, char *nome,char *sintomas,char *especialidade,int prioridade,int listaEspera,int pidC);
+void adicionarCliente(Balcao *b, pCliente utente, int id, Cliente cliente);
 void removerCLiente(Balcao *b,pCliente utente, int id);
 void mostrarDadosCliente(int id, Cliente utente);
 void mostrarTodosClientes(pBalcao b, pCliente utente);
 
-/// MEDICO
-Medico atribuirDadosMedico( char *nome, char *especialidade,int pidM);
-void adicionarMedico(Balcao *b, pMedico medico, int id, char *nome,char *especialidade,int pidM);
-void removerMedico(Balcao *b, pMedico medico, int id);
-void mostrarDadosMedico(int id, Medico medico);
-void mostrarTodosMedicos(pBalcao b, pMedico medico);
+
 
 
 

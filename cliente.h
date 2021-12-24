@@ -10,13 +10,11 @@ struct cliente{
     char areaEspecialidade[100];
     int prioridade;
     int id; // 0 - cliente nao existe
-            // > 0, - cliente existe e o id corresponde ao seu pid
+    // > 0, - cliente existe e o id corresponde ao seu pid
     int posicaoListaEspera;
 
+
 };
-
-
-
 
 
 #endif //TP_CLIENTE_H

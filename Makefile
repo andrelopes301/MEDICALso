@@ -6,18 +6,17 @@ balcao: balcao.o
 balcao.o: balcao.c balcao.h
 	gcc -c balcao.c
 
-
 cliente: cliente.o
 	gcc cliente.o -o cliente
 
-cliente.o: cliente.c balcao.h cliente.h
+cliente.o: cliente.c cliente.h
 	gcc -c cliente.c
 
 medico: medico.o
 	gcc medico.o -o medico
 
-medico.o: medico.c balcao.h medico.h
-	gcc -c medico.c
+medico.o: medico.c medico.h
+	gcc -c medico.c balcao.c
 
 
 clean: 
