@@ -12,6 +12,7 @@ struct cliente{
     int id; // 0 - cliente nao existe
     // > 0, - cliente existe e o id corresponde ao seu pid
     int posicaoListaEspera;
+    int atendido;
 
 
 };

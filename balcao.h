@@ -4,7 +4,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/select.h>
+#include <sys/time.h>
+#include <errno.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -50,20 +55,30 @@ struct balcao{
 
 //Estrutura da mensagem: cliente -> balcao
 typedef struct {
-    pid_t	pid_cliente;
+    pid_t	pid;
+    int medico_cliente; // medico = 0; cliente = 1
+    char nome[30];
+    int  atendido; //1 - a atender/ser atendido
+    char especialidade[30];
     char	mensagem[MAX];
-} Mensagem_cliente_para_Balcao;
+} Mensagem_utilizador_para_Balcao;
 
-//Estrutura da mensagem de respota do balcao
+
+
+//Estrutura da mensagem entre cliente e medico
+
+typedef struct {
+    char	mensagem[MAX];
+} Consulta;
+
+
+//Estrutura da mensagem de resposta do balcao
 typedef struct {
     pid_t pid_balcao;
+    pid_t pid_medico;
+    pid_t pid_cliente;
     char	mensagem[MAX];
 } Mensagem_Balcao;
-
-typedef struct {
-    pid_t	pid_medico;
-    char	mensagem[MAX];
-} Mensagem_medico_para_Balcao;
 
 
 
@@ -74,7 +89,7 @@ typedef struct {
 void encerra();
 void help();
 const char* classifica(char *sintomas);
-int comandos();
+void comandos(Balcao balcao, pCliente listaUtentes, pMedico listaMedicos);
 
 Balcao inicializarDadosBalcao(int MAXMEDICOS, int MAXCLIENTES);
 
@@ -82,7 +97,7 @@ Balcao inicializarDadosBalcao(int MAXMEDICOS, int MAXCLIENTES);
 /// MEDICO
 void adicionarMedico(Balcao *b, pMedico listaMedicos, int id, Medico medico);
 void removerMedico(Balcao *b, pMedico medico, int id);
-void mostrarTodosMedicos(pBalcao b, pMedico medico);
+void mostrarTodosMedicos(Balcao b, pMedico medico);
 void mostrarDadosMedico(int id, Medico medico);
 void sinal_vida(int s);
 
@@ -90,7 +105,7 @@ void sinal_vida(int s);
 void adicionarCliente(Balcao *b, pCliente utente, int id, Cliente cliente);
 void removerCLiente(Balcao *b,pCliente utente, int id);
 void mostrarDadosCliente(int id, Cliente utente);
-void mostrarTodosClientes(pBalcao b, pCliente utente);
+void mostrarTodosClientes(Balcao b, pCliente utente);
 
 
 
