@@ -1,1 +1,0 @@
-/usr/bin/cc -g CMakeFiles/tp.dir/medico.c.o CMakeFiles/tp.dir/cliente.c.o CMakeFiles/tp.dir/balcao.c.o -o tp 

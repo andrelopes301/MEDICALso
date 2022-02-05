@@ -6,6 +6,7 @@
 #include <string.h>
 #include <signal.h>
 #include <unistd.h>
+#include <pthread.h>
 #include <sys/types.h>
 #include <sys/select.h>
 #include <sys/time.h>
@@ -15,6 +16,7 @@
 #include <fcntl.h>
 #include "medico.h"
 #include "cliente.h"
+
 
 
 #define MAXESPECIALIDADES 5
@@ -44,7 +46,9 @@ struct balcao{
     int numClientes;
     int numMedicos;
     int numEspecialistas[MAXESPECIALIDADES]; // numero de especialistas por area
-    int filaEspera[MAXESPECIALIDADES]; //numero de pessoas em fila de espera por area
+    int filaEspera[MAXESPECIALIDADES][5]; //numero de pessoas em fila de espera por area
+    int tempoFila;
+    pthread_mutex_t mutex;
 
     //Exemplo:
     //filaEspera[0] - 1 utente - oftalmologia
@@ -85,30 +89,41 @@ typedef struct {
 
 
 
-
+long long tempoAtual();
 void encerra();
 void help();
-const char* classifica(char *sintomas);
-void comandos(Balcao balcao, pCliente listaUtentes, pMedico listaMedicos);
+const char* classifica(int pid,int b2c[2], int c2b[2],char *sintomas);
+void comandos(Balcao *balcao, pCliente listaUtentes, pMedico listaMedicos);
 
 Balcao inicializarDadosBalcao(int MAXMEDICOS, int MAXCLIENTES);
+Medico inicializarMedico();
+void terminaClientesMedicos(Balcao *balcao, pCliente listaUtentes,pMedico listaMedicos);
 
+void *mostraListaXsec(void *balcaoo);
+void alteraTempo(Balcao *b,int tempo);
+int devolveFila(char *especialidade);
+
+int validaDelut(Balcao *balcao, pCliente listaUtentes,int id);
+int validaDelesp(Balcao *balcao, pMedico listaMedicos,int id);
 
 /// MEDICO
 void adicionarMedico(Balcao *b, pMedico listaMedicos, int id, Medico medico);
 void removerMedico(Balcao *b, pMedico medico, int id);
-void mostrarTodosMedicos(Balcao b, pMedico medico);
-void mostrarDadosMedico(int id, Medico medico);
+void mostrarTodosMedicos(Balcao *b, pMedico medico);
+void mostrarDadosMedico(pid_t id, Medico medico);
 void sinal_vida(int s);
 
 /// CLIENTE
 void adicionarCliente(Balcao *b, pCliente utente, int id, Cliente cliente);
-void removerCLiente(Balcao *b,pCliente utente, int id);
+void removerCliente(Balcao *b,pCliente utente, int id);
 void mostrarDadosCliente(int id, Cliente utente);
-void mostrarTodosClientes(Balcao b, pCliente utente);
+void mostrarTodosClientes(Balcao *b, pCliente utente);
+Cliente inicializarCliente();
+void AtribuiLista(Balcao *b, Cliente cli);
+void organizaLista(Balcao *b, pCliente cli);
+void removeFromLista(Balcao *b,pid_t pid);
 
-
-
+void mostraListasEspera(Balcao *b);
 
 
 #endif //TP_BALCAO_H
